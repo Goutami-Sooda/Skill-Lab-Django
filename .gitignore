@@ -1,0 +1,4 @@
+.env
+/slab
+/todo_app/tasks/__pycache__
+/todo_app/todo_app/__pycache__
