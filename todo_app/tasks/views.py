@@ -7,23 +7,8 @@ def home(request):
     return HttpResponse("Hello, Django! Welcome to the To-Do App.")
 
 
-
-def task_list_create(request):
-    tasks = Task.objects.all().order_by('-created_at')
-
-    if request.method == 'POST':
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('task-list')
-    else:
-        form = TaskForm()
-
-    return render(request, 'tasks/task_list.html', {'form': form, 'tasks': tasks})
-
-
 def task_list(request):
-    tasks = Task.objects.all()
+    tasks = Task.objects.all().order_by('-created_at')
     form = TaskForm()
 
     if request.method == 'POST':
@@ -39,3 +24,4 @@ def mark_completed(request, pk):
     task.completed = True
     task.save()
     return redirect('task-list')
+

@@ -94,7 +94,7 @@
     </style>
 </head>
 <body>
-    <h1>📝 To-Do List</h1>
+    <h1>To-Do List</h1>
 
     <div class="task-form">
         <h3>Add a New Task</h3>
@@ -113,7 +113,7 @@
                     <strong>{{ task.title }}</strong> - {{ task.description }}
                     <small>({{ task.created_at|date:"M d, Y" }})</small>
                     {% if task.completed %}
-                        ✅ Completed
+                        Completed
                     {% else %}
                         <a href="{% url 'mark-completed' task.id %}" class="action-link">✔️ Mark as Done</a>
                     {% endif %}
