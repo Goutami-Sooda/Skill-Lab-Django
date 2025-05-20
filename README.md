@@ -27,11 +27,17 @@ Create a working Django project named `todo_app` with a simple home page rendere
   pip install django
   ```
 * Verify installation
+  ```python
+  django-admin --version
+  ```
 
 ### ✅ Step 3: Create Django Project
 
-* Create a project named `todo_app`
-* Navigate into the project folder
+* Create a project named `todo_app` and navigate to the folder
+  ```python
+  django-admin startproject todo_app
+  cd todo_app
+  ```
 * Project folder structure to reference:
 
   * `todo_app/`
@@ -44,11 +50,17 @@ Create a working Django project named `todo_app` with a simple home page rendere
 ### ✅ Step 4: Run Development Server
 
 * Start the development server
+  ```python
+  python manage.py runserver
+  ```
 * Visit [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser to confirm successful setup
 
 ### ✅ Step 5: Create an App Named `tasks`
 
-* Add a new app to the project
+* Add a new app `tasks` to the project
+  ```python
+  python manage.py startapp tasks
+  ```
 * New folder structure under `todo_app/` should include:
 
   * `tasks/`
