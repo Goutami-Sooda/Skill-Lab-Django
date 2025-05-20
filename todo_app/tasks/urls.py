@@ -1,16 +1,9 @@
 from django.urls import path
 from . import views
 
-urlpatterns = [
-    path('', views.home, name='home'),
-]
-
 
 urlpatterns = [
-    path('', views.task_list_create, name='task-list'),
-]
-
-urlpatterns = [
-    path('', views.task_list, name='task-list'),
-    path('complete/<int:pk>/', views.mark_completed, name='mark-completed'),
+    path('', views.tasks_home, name='tasks_home'),
+    path('api/tasks/complete/<int:pk>/', views.mark_complete_api, name='api-mark-complete'),
+    path('api/tasks/', views.task_api, name='task-api'),  
 ]

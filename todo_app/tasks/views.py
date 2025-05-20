@@ -3,39 +3,43 @@ from .models import Task
 from .forms import TaskForm
 from django.http import HttpResponse
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import TaskSerializer
+
+
 def home(request):
     return HttpResponse("Hello, Django! Welcome to the To-Do App.")
 
 
-
-def task_list_create(request):
-    tasks = Task.objects.all().order_by('-created_at')
-
-    if request.method == 'POST':
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('task-list')
-    else:
-        form = TaskForm()
-
-    return render(request, 'tasks/task_list.html', {'form': form, 'tasks': tasks})
+def tasks_home(request):
+    return render(request, 'tasks/task_list.html')
 
 
-def task_list(request):
-    tasks = Task.objects.all()
-    form = TaskForm()
+@api_view(['GET', 'POST'])
+def task_api(request):
+    if request.method == 'GET':
+        tasks = Task.objects.all().order_by('-created_at')
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == 'POST':
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('task-list')
 
-    return render(request, 'tasks/task_list.html', {'tasks': tasks, 'form': form})
+@api_view(['PATCH'])
+def mark_complete_api(request, pk):
+    try:
+        task = Task.objects.get(pk=pk)
+    except Task.DoesNotExist:
+        return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
 
-def mark_completed(request, pk):
-    task = get_object_or_404(Task, pk=pk)
     task.completed = True
     task.save()
-    return redirect('task-list')
+    serializer = TaskSerializer(task)
+    return Response(serializer.data)

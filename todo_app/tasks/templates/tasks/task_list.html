@@ -97,31 +97,105 @@
     <h1>📝 To-Do List</h1>
 
     <div class="task-form">
-        <h3>Add a New Task</h3>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
+        <h3>Add a New Task (via API)</h3>
+        <form id="taskForm">
+            <input type="text" id="title" placeholder="Title" required><br><br>
+            <textarea id="description" placeholder="Description"></textarea><br><br>
             <button type="submit">Add Task</button>
         </form>
     </div>
 
     <div class="task-list">
-        <h3>Task List</h3>
-        {% for task in tasks %}
-            <div class="task-item {% if task.completed %}completed{% else %}pending{% endif %}">
-                <div class="task-content">
-                    <strong>{{ task.title }}</strong> - {{ task.description }}
-                    <small>({{ task.created_at|date:"M d, Y" }})</small>
-                    {% if task.completed %}
-                        ✅ Completed
-                    {% else %}
-                        <a href="{% url 'mark-completed' task.id %}" class="action-link">✔️ Mark as Done</a>
-                    {% endif %}
-                </div>
-            </div>
-        {% empty %}
-            <p>No tasks added yet.</p>
-        {% endfor %}
+        <h3>Task List (from API)</h3>
+        <div id="taskContainer">
+            <!-- Tasks will be loaded here -->
+        </div>
     </div>
 </body>
 </html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const taskContainer = document.getElementById('taskContainer');
+        const taskForm = document.getElementById('taskForm');
+        const apiUrl = '/api/tasks/';
+
+        // Fetch and display tasks
+        async function fetchTasks() {
+            const res = await fetch(apiUrl);
+            const tasks = await res.json();
+
+            taskContainer.innerHTML = '';
+            tasks.forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = `task-item ${task.completed ? 'completed' : 'pending'}`;
+
+                let completeBtn = '';
+                if (!task.completed) {
+                    completeBtn = `<button class="complete-btn" data-id="${task.id}">Mark as Completed  </button>`;
+                }
+
+                taskDiv.innerHTML = `
+                    <div class="task-content">
+                        <strong>${task.title}</strong> - ${task.description}
+                        <small>(${new Date(task.created_at).toLocaleDateString()})</small>
+                        ${task.completed ? '✅ Completed' : ''}
+                    </div>
+                    ${completeBtn}
+                `;
+
+                taskContainer.appendChild(taskDiv);
+            });
+        }
+
+        // Submit new task
+        taskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ title, description })
+            });
+
+            if (response.ok) {
+                taskForm.reset();
+                fetchTasks();  // Refresh the list
+            } else {
+                alert('Failed to add task');
+            }
+        });
+
+        taskContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('complete-btn')) {
+                const taskId = e.target.dataset.id;
+
+                const response = await fetch(`/api/tasks/complete/${taskId}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                });
+
+                if (response.ok) {
+                    fetchTasks();  // Refresh task list
+                } else {
+                    alert('Failed to mark task as complete.');
+                }
+            }
+        });
+
+        // CSRF Token helper for POST requests
+        function getCSRFToken() {
+            const cookieValue = document.cookie.match('(^|;)\\s*csrftoken\\s*=\\s*([^;]+)');
+            return cookieValue ? cookieValue.pop() : '';
+        }
+
+        fetchTasks();
+    });
+</script>
