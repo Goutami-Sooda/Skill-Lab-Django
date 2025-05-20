@@ -10,7 +10,7 @@ from .serializers import TaskSerializer
 
 
 def home(request):
-    return HttpResponse("Hello, Django! Welcome to the To-Do App.")
+    return render(request, 'home.html')
 
 
 def tasks_home(request):
