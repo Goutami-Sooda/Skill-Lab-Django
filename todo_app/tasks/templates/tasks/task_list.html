@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 2rem;
+            color: #333;
+        }
+
+        h1 {
+            color: #4a4a4a;
+            text-align: center;
+        }
+
+        .task-form {
+            background: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .task-form h3 {
+            margin-top: 0;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .task-list {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .task-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .task-item.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .task-item.pending {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .action-link {
+            margin-left: 1rem;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        small {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>📝 To-Do List</h1>
+
+    <div class="task-form">
+        <h3>Add a New Task (via API)</h3>
+        <form id="taskForm">
+            <input type="text" id="title" placeholder="Title" required><br><br>
+            <textarea id="description" placeholder="Description"></textarea><br><br>
+            <button type="submit">Add Task</button>
+        </form>
+    </div>
+
+    <div class="task-list">
+        <h3>Task List (from API)</h3>
+        <div id="taskContainer">
+            <!-- Tasks will be loaded here -->
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const taskContainer = document.getElementById('taskContainer');
+        const taskForm = document.getElementById('taskForm');
+        const apiUrl = '/api/tasks/';
+
+        // Fetch and display tasks
+        async function fetchTasks() {
+            const res = await fetch(apiUrl);
+            const tasks = await res.json();
+
+            taskContainer.innerHTML = '';
+            tasks.forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = `task-item ${task.completed ? 'completed' : 'pending'}`;
+
+                let completeBtn = '';
+                if (!task.completed) {
+                    completeBtn = `<button class="complete-btn" data-id="${task.id}">Mark as Completed  </button>`;
+                }
+
+                taskDiv.innerHTML = `
+                    <div class="task-content">
+                        <strong>${task.title}</strong> - ${task.description}
+                        <small>(${new Date(task.created_at).toLocaleDateString()})</small>
+                        ${task.completed ? '✅ Completed' : ''}
+                    </div>
+                    ${completeBtn}
+                `;
+
+                taskContainer.appendChild(taskDiv);
+            });
+        }
+
+        // Submit new task
+        taskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ title, description })
+            });
+
+            if (response.ok) {
+                taskForm.reset();
+                fetchTasks();  // Refresh the list
+            } else {
+                alert('Failed to add task');
+            }
+        });
+
+        taskContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('complete-btn')) {
+                const taskId = e.target.dataset.id;
+
+                const response = await fetch(`/api/tasks/complete/${taskId}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                });
+
+                if (response.ok) {
+                    fetchTasks();  // Refresh task list
+                } else {
+                    alert('Failed to mark task as complete.');
+                }
+            }
+        });
+
+        // CSRF Token helper for POST requests
+        function getCSRFToken() {
+            const cookieValue = document.cookie.match('(^|;)\\s*csrftoken\\s*=\\s*([^;]+)');
+            return cookieValue ? cookieValue.pop() : '';
+        }
+
+        fetchTasks();
+    });
+</script>
