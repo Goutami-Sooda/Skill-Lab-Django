@@ -9,17 +9,17 @@ This session focuses on building the core functionalities of a basic To-Do appli
 
 ---
 
-## Step 2: Create a Model Form for Task Input
+## Step 1: Create a Model Form for Task Input
 
-📄 File: `tasks/forms.py`
+  File: `tasks/forms.py`
 
 - Create a `TaskForm` class that uses `Task` model and allows input of `title` and `description`.
 
 ---
 
-## Step 3: Add Views for Listing and Updating Tasks
+## Step 2: Add Views for Listing and Updating Tasks
 
-📄 File: `tasks/views.py`
+  File: `tasks/views.py`
 
 - Modify or add the following views:
   - `home` – for a simple welcome message. This is already there
@@ -28,7 +28,7 @@ This session focuses on building the core functionalities of a basic To-Do appli
 
 ---
 
-## Step 4: Set Up Templates for UI
+## Step 3: Set Up Templates for UI
 
  Folder: `tasks/templates/tasks/`  
  File: `task_list.html`
@@ -38,7 +38,7 @@ This session focuses on building the core functionalities of a basic To-Do appli
 
 ---
 
-##  Step 5: Configure App-Level URLs
+##  Step 4: Configure App-Level URLs
 
  File: `tasks/urls.py`
 
@@ -48,7 +48,7 @@ This session focuses on building the core functionalities of a basic To-Do appli
 
 ---
 
-##  Step 6: Include App URLs in Project URL Config
+##  Step 5: Include App URLs in Project URL Config
 
   File: `todo_project/urls.py`
 
