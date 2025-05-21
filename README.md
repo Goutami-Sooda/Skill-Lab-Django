@@ -84,10 +84,6 @@ Topics:
 
 > Code for this session is available in the `session4-forms-templates-mvp` branch
 
----
-
-### ☕ 2:30 PM - 4:30 PM
-
 #### **Session 5: APIs, CORS, & REST Basics**
 
 Topics:
@@ -104,7 +100,9 @@ Topics:
 * Show POST request to add a task, and GET to fetch tasks and display
 
 > Code for this session is available in the `api-cors-rest` branch
+---
 
+### ☕ 2:30 PM - 4:30 PM
 
 #### **Session 6: Mini Project Build + Wrap Up**
 
