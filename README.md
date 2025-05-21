@@ -9,14 +9,6 @@ This session focuses on building the core functionalities of a basic To-Do appli
 
 ---
 
-## Step 1: Update the Model to Represent Tasks
-
-📄 File: `tasks/models.py`
-
-- Define a `Task` model with fields for title, description, completed, and created_at.
-
----
-
 ## Step 2: Create a Model Form for Task Input
 
 📄 File: `tasks/forms.py`
@@ -63,12 +55,4 @@ This session focuses on building the core functionalities of a basic To-Do appli
 - Use `include()` to mount the `tasks.urls` into the main project routing.
 
 ---
-
-## Step 7: Apply Migrations for Task Model
-
-Run the following in terminal:
-
-```bash
-python manage.py makemigrations
-python manage.py migrate
 
